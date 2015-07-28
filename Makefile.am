@@ -13,15 +13,18 @@ libntkd_tasklet_system_la_SOURCES = \
 libntkd_tasklet_system_la_VALAFLAGS = \
 	-H ntkd-tasklet-system.h \
 	--library ntkd-tasklet-system \
+	--pkg gee-0.8 \
 	$(NULL)
 
 libntkd_tasklet_system_la_CPPFLAGS = \
 	-w \
 	$(GOBJECT_CFLAGS) \
+	$(GEE_CFLAGS) \
 	$(NULL)
 
 libntkd_tasklet_system_la_LIBADD = \
 	$(GOBJECT_LIBS) \
+	$(GEE_LIBS) \
 	$(NULL)
 
 

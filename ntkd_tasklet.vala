@@ -15,6 +15,7 @@
  *  You should have received a copy of the GNU General Public License
  *  along with Netsukuku.  If not, see <http://www.gnu.org/licenses/>.
  */
+using Gee;
 
 namespace Netsukuku
 {
@@ -102,6 +103,60 @@ namespace Netsukuku
         public abstract INtkdServerDatagramSocket get_server_datagram_socket(uint16 port, string dev) throws Error;
         public abstract INtkdClientDatagramSocket get_client_datagram_socket(uint16 port, string dev) throws Error;
         public abstract INtkdChannel get_channel();
+        public NtkdDispatchableTasklet create_dispatchable_tasklet() {return new NtkdDispatchableTasklet(this);}
+    }
+
+    public class NtkdDispatchableTasklet
+    {
+        private class DispatchedTasklet : Object
+        {
+            public INtkdChannel ch;
+            public INtkdTaskletSpawnable sp;
+        }
+        private class DispatcherTasklet : Object, INtkdTaskletSpawnable
+        {
+            public NtkdDispatchableTasklet dsp;
+            public void * func()
+            {
+                while (dsp.lst_sp.size > 0)
+                {
+                    DispatchedTasklet x = dsp.lst_sp.remove_at(0);
+                    x.sp.func();
+                    if (x.ch.get_balance() < 0) x.ch.send_async(0);
+                }
+                return null;
+            }
+        }
+        private INtkdTaskletHandle? t;
+        private ArrayList<DispatchedTasklet> lst_sp;
+        private INtkdTasklet tasklet;
+        internal NtkdDispatchableTasklet(INtkdTasklet tasklet)
+        {
+            this.tasklet = tasklet;
+            t = null;
+            lst_sp = new ArrayList<DispatchedTasklet>();
+        }
+        public void dispatch(INtkdTaskletSpawnable sp, bool wait=false)
+        {
+            DispatchedTasklet dt = new DispatchedTasklet();
+            dt.ch = tasklet.get_channel();
+            dt.sp = sp;
+            lst_sp.add(dt);
+            if (t == null || !t.is_running())
+            {
+                DispatcherTasklet ts = new DispatcherTasklet();
+                ts.dsp = this;
+                t = tasklet.spawn(ts);
+            }
+            if (wait)
+            {
+                dt.ch.recv();
+            }
+        }
+        public bool is_empty()
+        {
+            return t == null || !t.is_running();
+        }
     }
 }
 
