@@ -17,14 +17,14 @@
  */
 using Gee;
 
-namespace Netsukuku
+namespace TaskletSystem
 {
-    public interface INtkdTaskletSpawnable : Object
+    public interface ITaskletSpawnable : Object
     {
         public abstract void * func();
     }
 
-    public interface INtkdTaskletHandle : Object
+    public interface ITaskletHandle : Object
     {
         public abstract bool is_running();
         public abstract void kill();
@@ -32,13 +32,13 @@ namespace Netsukuku
         public abstract void * join();
     }
 
-    public interface INtkdServerStreamSocket : Object
+    public interface IServerStreamSocket : Object
     {
-        public abstract INtkdConnectedStreamSocket accept() throws Error;
+        public abstract IConnectedStreamSocket accept() throws Error;
         public abstract void close() throws Error;
     }
 
-    public interface INtkdConnectedStreamSocket : Object
+    public interface IConnectedStreamSocket : Object
     {
         public string peer_address {
             get {
@@ -57,65 +57,65 @@ namespace Netsukuku
         public abstract void close() throws Error;
     }
 
-    public interface INtkdServerDatagramSocket : Object
+    public interface IServerDatagramSocket : Object
     {
         public abstract size_t recvfrom(uint8* b, size_t maxlen, out string rmt_ip, out uint16 rmt_port) throws Error;
         public abstract void close() throws Error;
     }
 
-    public interface INtkdClientDatagramSocket : Object
+    public interface IClientDatagramSocket : Object
     {
         public abstract size_t sendto(uint8* b, size_t len) throws Error;
         public abstract void close() throws Error;
     }
 
-    public class NtkdTaskletCommandResult : Object
+    public class TaskletCommandResult : Object
     {
         public string stdout;
         public string stderr;
         public int exit_status;
     }
 
-    public errordomain NtkdChannelError
+    public errordomain ChannelError
     {
         TIMEOUT
     }
 
-    public interface INtkdChannel : Object
+    public interface IChannel : Object
     {
         public abstract void send(Value v);
         public abstract void send_async(Value v);
         public abstract int get_balance();
         public abstract Value recv();
-        public abstract Value recv_with_timeout(int timeout_msec) throws NtkdChannelError;
+        public abstract Value recv_with_timeout(int timeout_msec) throws ChannelError;
     }
 
-    public interface INtkdTasklet : Object
+    public interface ITasklet : Object
     {
         public abstract void schedule();
         public abstract void ms_wait(int msec);
         [NoReturn]
         public abstract void exit_tasklet(void * ret);
-        public abstract INtkdTaskletHandle spawn(INtkdTaskletSpawnable sp, bool joinable=false);
-        public abstract NtkdTaskletCommandResult exec_command(string cmdline) throws Error;
-        public abstract INtkdServerStreamSocket get_server_stream_socket(uint16 port, string? my_addr=null) throws Error;
-        public abstract INtkdConnectedStreamSocket get_client_stream_socket(string dest_addr, uint16 dest_port, string? my_addr=null) throws Error;
-        public abstract INtkdServerDatagramSocket get_server_datagram_socket(uint16 port, string dev) throws Error;
-        public abstract INtkdClientDatagramSocket get_client_datagram_socket(uint16 port, string dev) throws Error;
-        public abstract INtkdChannel get_channel();
-        public NtkdDispatchableTasklet create_dispatchable_tasklet() {return new NtkdDispatchableTasklet(this);}
+        public abstract ITaskletHandle spawn(ITaskletSpawnable sp, bool joinable=false);
+        public abstract TaskletCommandResult exec_command(string cmdline) throws Error;
+        public abstract IServerStreamSocket get_server_stream_socket(uint16 port, string? my_addr=null) throws Error;
+        public abstract IConnectedStreamSocket get_client_stream_socket(string dest_addr, uint16 dest_port, string? my_addr=null) throws Error;
+        public abstract IServerDatagramSocket get_server_datagram_socket(uint16 port, string dev) throws Error;
+        public abstract IClientDatagramSocket get_client_datagram_socket(uint16 port, string dev) throws Error;
+        public abstract IChannel get_channel();
+        public DispatchableTasklet create_dispatchable_tasklet() {return new DispatchableTasklet(this);}
     }
 
-    public class NtkdDispatchableTasklet
+    public class DispatchableTasklet
     {
         private class DispatchedTasklet : Object
         {
-            public INtkdChannel ch;
-            public INtkdTaskletSpawnable sp;
+            public IChannel ch;
+            public ITaskletSpawnable sp;
         }
-        private class DispatcherTasklet : Object, INtkdTaskletSpawnable
+        private class DispatcherTasklet : Object, ITaskletSpawnable
         {
-            public NtkdDispatchableTasklet dsp;
+            public DispatchableTasklet dsp;
             public void * func()
             {
                 while (dsp.lst_sp.size > 0)
@@ -127,16 +127,16 @@ namespace Netsukuku
                 return null;
             }
         }
-        private INtkdTaskletHandle? t;
+        private ITaskletHandle? t;
         private ArrayList<DispatchedTasklet> lst_sp;
-        private INtkdTasklet tasklet;
-        internal NtkdDispatchableTasklet(INtkdTasklet tasklet)
+        private ITasklet tasklet;
+        internal DispatchableTasklet(ITasklet tasklet)
         {
             this.tasklet = tasklet;
             t = null;
             lst_sp = new ArrayList<DispatchedTasklet>();
         }
-        public void dispatch(INtkdTaskletSpawnable sp, bool wait=false)
+        public void dispatch(ITaskletSpawnable sp, bool wait=false)
         {
             DispatchedTasklet dt = new DispatchedTasklet();
             dt.ch = tasklet.get_channel();

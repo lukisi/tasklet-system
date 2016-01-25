@@ -1,7 +1,7 @@
 m4/*
-ntkd_tasklet.c
-ntkd-tasklet-system.h
-ntkd-tasklet-system.vapi
+tasklet_system.c
+tasklet-system.h
+tasklet-system.vapi
 Makefile.in
 Makefile
 *.lo

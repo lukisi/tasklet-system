@@ -3,26 +3,26 @@ ACLOCAL_AMFLAGS = -I m4
 .PHONY: check
 
 lib_LTLIBRARIES = \
-	libntkd-tasklet-system.la \
+	libtasklet-system.la \
 	$(NULL)
 
-libntkd_tasklet_system_la_SOURCES = \
-	ntkd_tasklet.vala \
+libtasklet_system_la_SOURCES = \
+	tasklet_system.vala \
 	$(NULL)
 
-libntkd_tasklet_system_la_VALAFLAGS = \
-	-H ntkd-tasklet-system.h \
-	--library ntkd-tasklet-system \
+libtasklet_system_la_VALAFLAGS = \
+	-H tasklet-system.h \
+	--library tasklet-system \
 	--pkg gee-0.8 \
 	$(NULL)
 
-libntkd_tasklet_system_la_CPPFLAGS = \
+libtasklet_system_la_CPPFLAGS = \
 	-w \
 	$(GOBJECT_CFLAGS) \
 	$(GEE_CFLAGS) \
 	$(NULL)
 
-libntkd_tasklet_system_la_LIBADD = \
+libtasklet_system_la_LIBADD = \
 	$(GOBJECT_LIBS) \
 	$(GEE_LIBS) \
 	$(NULL)
@@ -30,25 +30,25 @@ libntkd_tasklet_system_la_LIBADD = \
 
 vapidir = $(datadir)/vala/vapi
 dist_vapi_DATA = \
-	ntkd-tasklet-system.vapi \
+	tasklet-system.vapi \
 	$(NULL)
 
 include_HEADERS = \
-	ntkd-tasklet-system.h \
+	tasklet-system.h \
 	$(NULL)
 
 pkgconfigdir = $(libdir)/pkgconfig
 pkgconfig_DATA = \
-	ntkd-tasklet-system.pc \
+	tasklet-system.pc \
 	$(NULL)
 
 EXTRA_DIST = \
-	ntkd-tasklet-system.pc.in \
+	tasklet-system.pc.in \
 	$(NULL)
 
 MAINTAINERCLEANFILES = \
-	$(srcdir)/ntkd-tasklet-system.vapi \
+	$(srcdir)/tasklet-system.vapi \
 	$(NULL)
 
-ntkd-tasklet-system.vapi: libntkd_tasklet_system_la_vala.stamp
+tasklet-system.vapi: libtasklet_system_la_vala.stamp
 

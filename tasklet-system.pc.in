@@ -4,8 +4,8 @@ libdir=@libdir@
 includedir=@includedir@
 
 Name: @PACKAGE_NAME@
-Description: Netsukuku - Tasklet system API
+Description: Tasklet system API
 Version: @VERSION@
-Libs: -L${libdir} -lntkd-tasklet-system
+Libs: -L${libdir} -ltasklet-system
 Cflags: -I${includedir}
 
