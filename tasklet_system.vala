@@ -101,7 +101,7 @@ namespace TaskletSystem
         public abstract IServerStreamSocket get_server_stream_socket(uint16 port, string? my_addr=null) throws Error;
         public abstract IConnectedStreamSocket get_client_stream_socket(string dest_addr, uint16 dest_port, string? my_addr=null) throws Error;
         public abstract IServerDatagramSocket get_server_datagram_socket(uint16 port, string dev) throws Error;
-        public abstract IClientDatagramSocket get_client_datagram_socket(uint16 port, string dev) throws Error;
+        public abstract IClientDatagramSocket get_client_datagram_socket(uint16 port, string dev, string? my_addr=null) throws Error;
         public abstract IChannel get_channel();
         public DispatchableTasklet create_dispatchable_tasklet() {return new DispatchableTasklet(this);}
     }
