@@ -98,6 +98,8 @@ namespace TaskletSystem
         public abstract void exit_tasklet(void * ret);
         public abstract ITaskletHandle spawn(ITaskletSpawnable sp, bool joinable=false);
         public abstract TaskletCommandResult exec_command(string cmdline) throws Error;
+        public abstract size_t read(int fd, void* b, size_t maxlen) throws Error;
+        public abstract size_t write(int fd, void* b, size_t count) throws Error;
         public abstract IServerStreamSocket get_server_stream_socket(uint16 port, string? my_addr=null) throws Error;
         public abstract IConnectedStreamSocket get_client_stream_socket(string dest_addr, uint16 dest_port, string? my_addr=null) throws Error;
         public abstract IServerDatagramSocket get_server_datagram_socket(uint16 port, string dev) throws Error;
