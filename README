@@ -1,0 +1,5 @@
+Part of Netsukuku.
+
+This package builds a library that defines an API for a ''tasklet'' system.
+The ''ntkd'' daemon depends on it.
+
