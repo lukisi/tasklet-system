@@ -3,6 +3,8 @@ tasklet-system.h
 tasklet-system.vapi
 Makefile.in
 Makefile
+tasklet-system.pc
+*.o
 *.lo
 *.la
 .deps
