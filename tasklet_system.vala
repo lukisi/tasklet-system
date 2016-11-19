@@ -98,9 +98,13 @@ namespace TaskletSystem
         public abstract void exit_tasklet(void * ret);
         public abstract ITaskletHandle spawn(ITaskletSpawnable sp, bool joinable=false);
 
-        public abstract TaskletCommandResult exec_command_argv(string[] argv) throws Error;
+        public abstract TaskletCommandResult exec_command_argv(Gee.List<string> argv) throws Error;
         public TaskletCommandResult exec_command(string cmdline) throws Error
-        {return exec_command_argv(cmdline.split(" "));}
+        {
+            ArrayList<string> argv = new ArrayList<string>();
+            argv.add_all_array(cmdline.split(" "));
+            return exec_command_argv(argv);
+        }
 
         public abstract size_t read(int fd, void* b, size_t maxlen) throws Error;
         public abstract size_t write(int fd, void* b, size_t count) throws Error;
