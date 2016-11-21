@@ -120,8 +120,15 @@ namespace TaskletSystem
     {
         private class DispatchedTasklet : Object
         {
-            public IChannel ch;
+            public IChannel ch_end;
+            public IChannel ch_start;
             public ITaskletSpawnable sp;
+            public DispatchedTasklet(ITaskletSpawnable sp, IChannel ch_end, IChannel ch_start)
+            {
+                this.ch_end = ch_end;
+                this.ch_start = ch_start;
+                this.sp = sp;
+            }
         }
         private class DispatcherTasklet : Object, ITaskletSpawnable
         {
@@ -131,8 +138,9 @@ namespace TaskletSystem
                 while (dsp.lst_sp.size > 0)
                 {
                     DispatchedTasklet x = dsp.lst_sp.remove_at(0);
+                    if (x.ch_start.get_balance() < 0) x.ch_start.send_async(0);
                     x.sp.func();
-                    if (x.ch.get_balance() < 0) x.ch.send_async(0);
+                    if (x.ch_end.get_balance() < 0) x.ch_end.send_async(0);
                 }
                 return null;
             }
@@ -146,11 +154,9 @@ namespace TaskletSystem
             t = null;
             lst_sp = new ArrayList<DispatchedTasklet>();
         }
-        public void dispatch(ITaskletSpawnable sp, bool wait=false)
+        public void dispatch(ITaskletSpawnable sp, bool wait_end=false, bool wait_start=false)
         {
-            DispatchedTasklet dt = new DispatchedTasklet();
-            dt.ch = tasklet.get_channel();
-            dt.sp = sp;
+            DispatchedTasklet dt = new DispatchedTasklet(sp, tasklet.get_channel(), tasklet.get_channel());
             lst_sp.add(dt);
             if (t == null || !t.is_running())
             {
@@ -158,9 +164,13 @@ namespace TaskletSystem
                 ts.dsp = this;
                 t = tasklet.spawn(ts);
             }
-            if (wait)
+            if (wait_end)
             {
-                dt.ch.recv();
+                dt.ch_end.recv();
+            }
+            else if (wait_start)
+            {
+                dt.ch_start.recv();
             }
         }
         public bool is_empty()
