@@ -19,7 +19,7 @@ libtool
 aclocal.m4
 autom4te.cache
 config.guess
-config.h.in
+config.h.in*
 config.sub
 configure
 depcomp
@@ -29,5 +29,6 @@ missing
 test-driver
 compile
 .valencia
+.buildconfig
 debug
 finalbuild
