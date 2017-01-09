@@ -32,3 +32,5 @@ compile
 .buildconfig
 debug
 finalbuild
+*.anjuta*
+builds
