@@ -13,6 +13,7 @@ libtasklet_system_la_SOURCES = \
 libtasklet_system_la_VALAFLAGS = \
 	-H tasklet-system.h \
 	--library tasklet-system \
+	--vapidir $(GEE_PREFIX)/share/vala/vapi \
 	--pkg gee-0.8 \
 	$(NULL)
 
