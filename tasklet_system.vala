@@ -95,7 +95,7 @@ namespace TaskletSystem
         public abstract void schedule();
         public abstract void ms_wait(int msec);
         [NoReturn]
-        public abstract void exit_tasklet(void * ret);
+        public abstract void exit_tasklet(void * ret=null);
         public abstract ITaskletHandle spawn(ITaskletSpawnable sp, bool joinable=false);
 
         public abstract TaskletCommandResult exec_command_argv(Gee.List<string> argv) throws Error;
