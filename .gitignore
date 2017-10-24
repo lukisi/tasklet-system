@@ -28,9 +28,4 @@ ltmain.sh
 missing
 test-driver
 compile
-.valencia
-.buildconfig
-debug
-finalbuild
-*.anjuta*
-builds
+
