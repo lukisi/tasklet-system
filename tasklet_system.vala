@@ -32,6 +32,13 @@ namespace TaskletSystem
         public abstract void * join();
     }
 
+    public class TaskletCommandResult : Object
+    {
+        public string stdout;
+        public string stderr;
+        public int exit_status;
+    }
+
     public interface IServerStreamSocket : Object
     {
         public abstract IConnectedStreamSocket accept() throws Error;
@@ -40,26 +47,23 @@ namespace TaskletSystem
 
     public interface IConnectedStreamSocket : Object
     {
-        public string peer_address {
-            get {
-                return _peer_address_getter();
-            }
-        }
-        public abstract unowned string _peer_address_getter();
-        public string my_address {
-            get {
-                return _my_address_getter();
-            }
-        }
-        public abstract unowned string _my_address_getter();
         public abstract size_t recv(uint8* b, size_t maxlen) throws Error;
-        public abstract void send(uint8* b, size_t len) throws Error;
+        public abstract size_t send_part(uint8* b, size_t len) throws Error;
+        public void send(uint8* b, size_t len) throws Error
+        {
+            while (len > 0)
+            {
+                size_t done = send_part(b, len);
+                b += done;
+                len -= done;
+            }
+        }
         public abstract void close() throws Error;
     }
 
     public interface IServerDatagramSocket : Object
     {
-        public abstract size_t recvfrom(uint8* b, size_t maxlen, out string rmt_ip, out uint16 rmt_port) throws Error;
+        public abstract size_t recvfrom(uint8* b, size_t maxlen) throws Error;
         public abstract void close() throws Error;
     }
 
@@ -69,11 +73,36 @@ namespace TaskletSystem
         public abstract void close() throws Error;
     }
 
-    public class TaskletCommandResult : Object
+    public interface IServerStreamNetworkSocket : Object, IServerStreamSocket
     {
-        public string stdout;
-        public string stderr;
-        public int exit_status;
+    }
+
+    public interface IConnectedStreamNetworkSocket : Object, IConnectedStreamSocket
+    {
+    }
+
+    public interface IServerDatagramNetworkSocket : Object, IServerDatagramSocket
+    {
+    }
+
+    public interface IClientDatagramNetworkSocket : Object, IClientDatagramSocket
+    {
+    }
+
+    public interface IServerStreamLocalSocket : Object, IServerStreamSocket
+    {
+    }
+
+    public interface IConnectedStreamLocalSocket : Object, IConnectedStreamSocket
+    {
+    }
+
+    public interface IServerDatagramLocalSocket : Object, IServerDatagramSocket
+    {
+    }
+
+    public interface IClientDatagramLocalSocket : Object, IClientDatagramSocket
+    {
     }
 
     public errordomain ChannelError
@@ -108,11 +137,17 @@ namespace TaskletSystem
 
         public abstract size_t read(int fd, void* b, size_t maxlen) throws Error;
         public abstract size_t write(int fd, void* b, size_t count) throws Error;
-        public abstract IServerStreamSocket get_server_stream_socket(uint16 port, string? my_addr=null) throws Error;
-        public abstract IConnectedStreamSocket get_client_stream_socket(string dest_addr, uint16 dest_port, string? my_addr=null) throws Error;
-        public abstract IServerDatagramSocket get_server_datagram_socket(uint16 port, string dev) throws Error;
-        public abstract IClientDatagramSocket get_client_datagram_socket(uint16 port, string dev, string? my_addr=null) throws Error;
+        public abstract IServerStreamNetworkSocket get_server_stream_network_socket(string my_addr, uint16 my_tcp_port) throws Error;
+        public abstract IConnectedStreamNetworkSocket get_client_stream_network_socket(string dest_addr, uint16 dest_tcp_port) throws Error;
+        public abstract IServerDatagramNetworkSocket get_server_datagram_network_socket(uint16 udp_port, string my_dev) throws Error;
+        public abstract IClientDatagramNetworkSocket get_client_datagram_network_socket(uint16 udp_port, string my_dev) throws Error;
+        public abstract IServerStreamLocalSocket get_server_stream_local_socket(string listen_pathname) throws Error;
+        public abstract IConnectedStreamLocalSocket get_client_stream_local_socket(string send_pathname) throws Error;
+        public abstract IServerDatagramLocalSocket get_server_datagram_local_socket(string listen_pathname) throws Error;
+        public abstract IClientDatagramLocalSocket get_client_datagram_local_socket(string send_pathname) throws Error;
+
         public abstract IChannel get_channel();
+
         public DispatchableTasklet create_dispatchable_tasklet() {return new DispatchableTasklet(this);}
     }
 
